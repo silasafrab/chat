@@ -9,17 +9,24 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/auth-context";
 
-const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8, "A senha deve ter no mínimo 8 caracteres"),
-});
+const formSchema = z
+  .object({
+    email: z.string().email("Email inválido"),
+    password: z
+      .string()
+      .min(8, "A senha deve ter no mínimo 8 caracteres"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "As senhas não coincidem",
+    path: ["confirmPassword"],
+  });
 
-const LoginPage = () => {
+const RegisterPage = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { register } = useAuth();
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -27,6 +34,7 @@ const LoginPage = () => {
     defaultValues: {
       email: "",
       password: "",
+      confirmPassword: "",
     },
     resolver: zodResolver(formSchema),
   });
@@ -36,22 +44,18 @@ const LoginPage = () => {
     setIsSubmitting(true);
 
     try {
-      await login(data.email, data.password);
+      await register(data.email, data.password);
       navigate("/dashboard/messages");
     } catch (err: unknown) {
       if (err instanceof Error) {
         const message = err.message;
 
-        if (message.includes("invalid-credential")) {
-          setError("Email ou senha inválidos.");
-        } else if (message.includes("user-not-found")) {
-          setError("Usuário não encontrado.");
-        } else if (message.includes("wrong-password")) {
-          setError("Senha incorreta.");
-        } else if (message.includes("too-many-requests")) {
-          setError("Muitas tentativas. Tente novamente mais tarde.");
+        if (message.includes("email-already-in-use")) {
+          setError("Este email já está em uso.");
+        } else if (message.includes("weak-password")) {
+          setError("Senha muito fraca.");
         } else {
-          setError("Erro ao fazer login. Tente novamente.");
+          setError("Erro ao criar conta. Tente novamente.");
         }
       }
     } finally {
@@ -73,7 +77,7 @@ const LoginPage = () => {
           <div className="absolute inset-y-0 -left-1 h-[calc(100%+3rem)] -translate-y-6 border-s max-sm:hidden" />
           <div className="absolute inset-y-0 -right-1 h-[calc(100%+3rem)] -translate-y-6 border-e max-sm:hidden" />
 
-          <p className="mt-4 font-medium text-xl">Log in to Broadcast</p>
+          <p className="mt-4 font-medium text-xl">Criar conta</p>
 
           {error && (
             <p className="mt-4 w-full rounded-md bg-destructive/10 p-3 text-center text-sm text-destructive">
@@ -81,18 +85,8 @@ const LoginPage = () => {
             </p>
           )}
 
-          <Button className="mt-8 w-full gap-3">
-            <GoogleLogo />
-            Continue with Google
-          </Button>
-
-          <div className="my-7 flex w-full items-center justify-center overflow-hidden">
-            <Separator />
-            <span className="px-2 text-sm">OR</span>
-            <Separator />
-          </div>
           <form
-            className="w-full space-y-4"
+            className="mt-8 w-full space-y-4"
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <Controller
@@ -129,30 +123,47 @@ const LoginPage = () => {
                 </Field>
               )}
             />
+            <Controller
+              control={form.control}
+              name="confirmPassword"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Confirmar senha</FieldLabel>
+                  <Input
+                    aria-invalid={fieldState.invalid}
+                    className="w-full"
+                    placeholder="Confirmar senha"
+                    type="password"
+                    {...field}
+                  />
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
+            />
             <Button
               className="mt-4 w-full"
               disabled={isSubmitting}
               type="submit"
             >
-              {isSubmitting ? "Entrando..." : "Entrar"}
+              {isSubmitting ? "Criando conta..." : "Criar conta"}
             </Button>
           </form>
 
-          <div className="mt-5 space-y-5">
+          <div className="mt-5">
             <p className="text-center text-sm">
-              Não tem uma conta?{" "}
+              Já tem uma conta?{" "}
               <Link
                 className="ml-1 text-muted-foreground underline"
-                to="/register"
+                to="/"
               >
-                Criar conta
+                Fazer login
               </Link>
             </p>
           </div>
         </div>
         <div className="relative hidden w-full max-w-2xl grow border-l bg-muted lg:block">
           <img
-            alt="Login"
+            alt="Register"
             className="absolute inset-0 size-full object-cover"
             src="/images/ascii-art.png"
           />
@@ -162,40 +173,4 @@ const LoginPage = () => {
   );
 };
 
-const GoogleLogo = () => (
-  <svg
-    className="inline-block size-lg shrink-0 align-sub text-inherit"
-    fill="none"
-    height="1.2em"
-    id="icon-google"
-    viewBox="0 0 16 16"
-    width="1.2em"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <g clipPath="url(#clip0)">
-      <path
-        d="M15.6823 8.18368C15.6823 7.63986 15.6382 7.0931 15.5442 6.55811H7.99829V9.63876H12.3194C12.1401 10.6323 11.564 11.5113 10.7203 12.0698V14.0687H13.2983C14.8122 12.6753 15.6823 10.6176 15.6823 8.18368Z"
-        fill="#4285F4"
-      />
-      <path
-        d="M7.99812 16C10.1558 16 11.9753 15.2915 13.3011 14.0687L10.7231 12.0698C10.0058 12.5578 9.07988 12.8341 8.00106 12.8341C5.91398 12.8341 4.14436 11.426 3.50942 9.53296H0.849121V11.5936C2.2072 14.295 4.97332 16 7.99812 16Z"
-        fill="#34A853"
-      />
-      <path
-        d="M3.50665 9.53295C3.17154 8.53938 3.17154 7.4635 3.50665 6.46993V4.4093H0.849292C-0.285376 6.66982 -0.285376 9.33306 0.849292 11.5936L3.50665 9.53295Z"
-        fill="#FBBC04"
-      />
-      <path
-        d="M7.99812 3.16589C9.13867 3.14825 10.241 3.57743 11.067 4.36523L13.3511 2.0812C11.9048 0.723121 9.98526 -0.0235266 7.99812 -1.02057e-05C4.97332 -1.02057e-05 2.2072 1.70493 0.849121 4.40932L3.50648 6.46995C4.13848 4.57394 5.91104 3.16589 7.99812 3.16589Z"
-        fill="#EA4335"
-      />
-    </g>
-    <defs>
-      <clipPath id="clip0">
-        <rect fill="white" height="16" width="15.6825" />
-      </clipPath>
-    </defs>
-  </svg>
-);
-
-export default LoginPage;
+export default RegisterPage;
