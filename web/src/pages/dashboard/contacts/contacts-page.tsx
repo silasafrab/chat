@@ -34,6 +34,7 @@ import { formatString } from "@/utils/format-string";
 import Icon from "@/components/ui/Icon/Icon";
 import { Typography } from "@/components/ui/typography/typography";
 import { ContactsMobileCard } from "./components/contactsMobileCard";
+import { LoadingState } from "@/components/composites/loading-state";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 export default function ContactsPage() {
@@ -118,11 +119,7 @@ export default function ContactsPage() {
   const { page, totalPages, paginatedItems, goToPage } = usePagination(filteredContacts);
 
   if (loading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-muted-foreground">Carregando...</p>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   return (

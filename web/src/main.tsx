@@ -7,6 +7,7 @@ import { Toaster } from "sonner";
 import { AuthProvider } from "@/contexts/auth-context";
 import { ThemeProvider } from "@/contexts/theme-context";
 import { PrivateRoute } from "@/routes/private-route";
+import { PublicRoute } from "@/routes/public-route";
 
 import LoginPage from "./pages/login/loginPage";
 import RegisterPage from "./pages/register/register-page";
@@ -17,12 +18,17 @@ import MessagesPage from "./pages/dashboard/messages/messages-page";
 
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <LoginPage />,
-  },
-  {
-    path: "/register",
-    element: <RegisterPage />,
+    element: <PublicRoute />,
+    children: [
+      {
+        path: "/",
+        element: <LoginPage />,
+      },
+      {
+        path: "/register",
+        element: <RegisterPage />,
+      },
+    ],
   },
   {
     path: "/dashboard",
@@ -33,7 +39,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <Navigate to="messages" replace />,
+            element: <Navigate to="connections" replace />,
           },
           {
             path: "connections",

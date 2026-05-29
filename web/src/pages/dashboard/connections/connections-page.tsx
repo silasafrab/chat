@@ -14,6 +14,7 @@ import {
 import type { Connection } from "@/types/connection";
 import { EmptyCard } from "@/components/composites/emptyCard";
 import { ConfirmDelete } from "@/components/composites/confirm-delete";
+import { LoadingState } from "@/components/composites/loading-state";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 const typeOptions = [
@@ -107,11 +108,7 @@ export default function ConnectionsPage() {
   const { page, totalPages, paginatedItems, goToPage } = usePagination(filteredConnections);
 
   if (loading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-muted-foreground">Carregando...</p>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   return (

@@ -39,7 +39,7 @@ const LoginPage = () => {
 
     try {
       await login(data.email, data.password);
-      navigate("/dashboard/messages");
+      navigate("/dashboard/connections");
     } catch (err: unknown) {
       if (err instanceof Error) {
         const message = err.message;

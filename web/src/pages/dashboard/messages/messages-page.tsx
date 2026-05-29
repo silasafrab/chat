@@ -17,6 +17,7 @@ import { HeaderTitle } from "@/components/composites/header-title";
 import { FilterBar } from "@/components/composites/filter-bar";
 import { EmptyCard } from "@/components/composites/emptyCard";
 import { ConfirmDelete } from "@/components/composites/confirm-delete";
+import { LoadingState } from "@/components/composites/loading-state";
 import Icon from "@/components/ui/Icon/Icon";
 import { Typography } from "@/components/ui/typography/typography";
 import { useMessages } from "@/hooks/use-messages";
@@ -176,11 +177,7 @@ export default function MessagesPage() {
   const { page, totalPages, paginatedItems, goToPage } = usePagination(filteredMessages);
 
   if (loading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-muted-foreground">Carregando...</p>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   return (
