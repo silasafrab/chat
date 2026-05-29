@@ -4,13 +4,17 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import loginImg from "@/assets/login-img.png"
+
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/auth-context";
+import { toast } from "sonner";
+import { Card } from "@/components/ui/card";
+import { Typography } from "@/components/ui/typography/typography";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -20,7 +24,6 @@ const formSchema = z.object({
 const LoginPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -32,7 +35,6 @@ const LoginPage = () => {
   });
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    setError("");
     setIsSubmitting(true);
 
     try {
@@ -43,15 +45,15 @@ const LoginPage = () => {
         const message = err.message;
 
         if (message.includes("invalid-credential")) {
-          setError("Email ou senha inválidos.");
+          toast.error("Email ou senha inválidos.");
         } else if (message.includes("user-not-found")) {
-          setError("Usuário não encontrado.");
+          toast.error("Usuário não encontrado.");
         } else if (message.includes("wrong-password")) {
-          setError("Senha incorreta.");
+          toast.error("Senha incorreta.");
         } else if (message.includes("too-many-requests")) {
-          setError("Muitas tentativas. Tente novamente mais tarde.");
+          toast.error("Muitas tentativas. Tente novamente mais tarde.");
         } else {
-          setError("Erro ao fazer login. Tente novamente.");
+          toast.error("Erro ao fazer login. Tente novamente.");
         }
       }
     } finally {
@@ -60,142 +62,94 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex h-screen items-center justify-center">
-      <div className="flex h-full w-full">
-        <div className="relative m-auto flex w-full max-w-sm flex-col items-center p-8 outline-0 outline-border/40 outline-offset-0.5 sm:outline-2 dark:outline-border/80">
-          <div className="absolute inset-x-0 top-0 w-[calc(100%+4rem)] -translate-x-8 border-t max-sm:hidden" />
-          <div className="absolute inset-x-0 bottom-0 w-[calc(100%+4rem)] -translate-x-8 border-b max-sm:hidden" />
-          <div className="absolute inset-y-0 left-0 h-[calc(100%+4rem)] -translate-y-8 border-s max-sm:hidden" />
-          <div className="absolute inset-y-0 right-0 h-[calc(100%+4rem)] -translate-y-8 border-e max-sm:hidden" />
+    <div className="flex h-screen items-center px-4 justify-center">
 
-          <div className="absolute inset-x-0 -top-1 w-[calc(100%+3rem)] -translate-x-6 border-t max-sm:hidden" />
-          <div className="absolute inset-x-0 -bottom-1 w-[calc(100%+3rem)] -translate-x-6 border-b max-sm:hidden" />
-          <div className="absolute inset-y-0 -left-1 h-[calc(100%+3rem)] -translate-y-6 border-s max-sm:hidden" />
-          <div className="absolute inset-y-0 -right-1 h-[calc(100%+3rem)] -translate-y-6 border-e max-sm:hidden" />
+      <Card className=" w-full md:max-w-2xl gap-0 flex flex-row p-0">
+        <img src={loginImg} className=" flex-1 w-1/2 hidden md:block rounded-2xl" />
+        <div className="flex w-full md:w-1/2 p-5 items-center">
+          <div className="w-full">
+            <div className="mb-3">
 
-          <p className="mt-4 font-medium text-xl">Log in to Broadcast</p>
-
-          {error && (
-            <p className="mt-4 w-full rounded-md bg-destructive/10 p-3 text-center text-sm text-destructive">
-              {error}
-            </p>
-          )}
-
-          <Button className="mt-8 w-full gap-3">
-            <GoogleLogo />
-            Continue with Google
-          </Button>
-
-          <div className="my-7 flex w-full items-center justify-center overflow-hidden">
-            <Separator />
-            <span className="px-2 text-sm">OR</span>
-            <Separator />
-          </div>
-          <form
-            className="w-full space-y-4"
-            onSubmit={form.handleSubmit(onSubmit)}
-          >
-            <Controller
-              control={form.control}
-              name="email"
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>Email</FieldLabel>
-                  <Input
-                    aria-invalid={fieldState.invalid}
-                    className="w-full"
-                    placeholder="Email"
-                    type="email"
-                    {...field}
-                  />
-                  <FieldError errors={[fieldState.error]} />
-                </Field>
-              )}
-            />
-            <Controller
-              control={form.control}
-              name="password"
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>Senha</FieldLabel>
-                  <Input
-                    aria-invalid={fieldState.invalid}
-                    className="w-full"
-                    placeholder="Senha"
-                    type="password"
-                    {...field}
-                  />
-                  <FieldError errors={[fieldState.error]} />
-                </Field>
-              )}
-            />
-            <Button
-              className="mt-4 w-full"
-              disabled={isSubmitting}
-              type="submit"
+              <p className="text-2xl">👋 </p>
+              <Typography type="heading-s" className="font-semibold">
+                Bem vindo ao futuro
+              </Typography>
+            </div>
+            <form
+              className="w-full space-y-4"
+              onSubmit={form.handleSubmit(onSubmit)}
             >
-              {isSubmitting ? "Entrando..." : "Entrar"}
-            </Button>
-          </form>
+              <Controller
+                control={form.control}
+                name="email"
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel className="text-muted-foreground">Seu e-mail</FieldLabel>
+                    <Input
 
-          <div className="mt-5 space-y-5">
-            <p className="text-center text-sm">
-              Não tem uma conta?{" "}
-              <Link
-                className="ml-1 text-muted-foreground underline"
-                to="/register"
+                      aria-invalid={fieldState.invalid}
+                      className="w-full bg-primary/10"
+                      placeholder="Email"
+                      type="email"
+                      {...field}
+                    />
+                    <FieldError errors={[fieldState.error]} />
+                  </Field>
+                )}
+              />
+              <Controller
+                control={form.control}
+                name="password"
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel className="text-muted-foreground">Sua senha</FieldLabel>
+                    <Input
+                      aria-invalid={fieldState.invalid}
+                      className="w-full bg-primary/10"
+                      placeholder="Senha"
+                      type="password"
+                      {...field}
+                    />
+                    <FieldError errors={[fieldState.error]} />
+                  </Field>
+                )}
+              />
+              <Button
+                className="mt-4 w-full"
+                disabled={isSubmitting}
+                type="submit"
               >
-                Criar conta
-              </Link>
-            </p>
+                {isSubmitting ? "Entrando..." : "Entrar"}
+              </Button>
+            </form>
+            <div className="mt-5 space-y-5">
+              <Typography type="body-s" className="text-center text-muted-foreground">
+                Não tem uma conta?{" "}
+                <Link
+                  className="ml-1 text-muted-foreground underline"
+                  to="/register"
+                >
+                  Criar conta
+                </Link>
+              </Typography>
+            </div>
           </div>
         </div>
-        <div className="relative hidden w-full max-w-2xl grow border-l bg-muted lg:block">
-          <img
-            alt="Login"
-            className="absolute inset-0 size-full object-cover"
-            src="/images/ascii-art.png"
-          />
-        </div>
+      </Card>
+      <div className="absolute bottom-5">
+        <Typography>
+          Desenvolvido por  <Link
+            className="font-bold text-primary hover:text-primary/80 duration-300"
+            to="https://www.silasafra.com/pt" target="_blank"
+          >
+            Silas Afra
+          </Link>
+        </Typography>
       </div>
     </div>
   );
 };
 
-const GoogleLogo = () => (
-  <svg
-    className="inline-block size-lg shrink-0 align-sub text-inherit"
-    fill="none"
-    height="1.2em"
-    id="icon-google"
-    viewBox="0 0 16 16"
-    width="1.2em"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <g clipPath="url(#clip0)">
-      <path
-        d="M15.6823 8.18368C15.6823 7.63986 15.6382 7.0931 15.5442 6.55811H7.99829V9.63876H12.3194C12.1401 10.6323 11.564 11.5113 10.7203 12.0698V14.0687H13.2983C14.8122 12.6753 15.6823 10.6176 15.6823 8.18368Z"
-        fill="#4285F4"
-      />
-      <path
-        d="M7.99812 16C10.1558 16 11.9753 15.2915 13.3011 14.0687L10.7231 12.0698C10.0058 12.5578 9.07988 12.8341 8.00106 12.8341C5.91398 12.8341 4.14436 11.426 3.50942 9.53296H0.849121V11.5936C2.2072 14.295 4.97332 16 7.99812 16Z"
-        fill="#34A853"
-      />
-      <path
-        d="M3.50665 9.53295C3.17154 8.53938 3.17154 7.4635 3.50665 6.46993V4.4093H0.849292C-0.285376 6.66982 -0.285376 9.33306 0.849292 11.5936L3.50665 9.53295Z"
-        fill="#FBBC04"
-      />
-      <path
-        d="M7.99812 3.16589C9.13867 3.14825 10.241 3.57743 11.067 4.36523L13.3511 2.0812C11.9048 0.723121 9.98526 -0.0235266 7.99812 -1.02057e-05C4.97332 -1.02057e-05 2.2072 1.70493 0.849121 4.40932L3.50648 6.46995C4.13848 4.57394 5.91104 3.16589 7.99812 3.16589Z"
-        fill="#EA4335"
-      />
-    </g>
-    <defs>
-      <clipPath id="clip0">
-        <rect fill="white" height="16" width="15.6825" />
-      </clipPath>
-    </defs>
-  </svg>
-);
+
 
 export default LoginPage;
