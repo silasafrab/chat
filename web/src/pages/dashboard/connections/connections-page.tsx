@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useConnections } from "@/hooks/use-connections";
 import { HeaderTitle } from "@/components/composites/header-title";
 import { FilterBar } from "@/components/composites/filter-bar";
@@ -95,8 +94,6 @@ export default function ConnectionsPage() {
 
     return matchesSearch && matchesType && matchesStatus;
   });
-
-  const hasActiveFilters = search || (typeFilter && typeFilter !== "all") || (statusFilter && statusFilter !== "all");
 
   const clearFilters = () => {
     setSearch("");

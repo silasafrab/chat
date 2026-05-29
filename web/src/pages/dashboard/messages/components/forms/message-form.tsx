@@ -251,7 +251,6 @@ export const MessageForm = ({
                       selected={field.value ?? undefined}
                       onSelect={(date) => field.onChange(date ?? null)}
                       disabled={(date) => date < startOfDay(new Date())}
-                      initialFocus
                     />
                   </PopoverContent>
                 </Popover>

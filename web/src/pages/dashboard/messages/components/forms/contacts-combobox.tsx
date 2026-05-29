@@ -45,7 +45,6 @@ export function ContactsCombobox({
 
   const handleValueChange = React.useCallback(
     (newValue: unknown) => {
-      console.log("[Combobox] onValueChange called with:", newValue);
       onChange(normalizeContactIds(newValue));
     },
     [onChange],
@@ -65,10 +64,7 @@ export function ContactsCombobox({
       autoHighlight
       items={items}
       value={value}
-      onValueChange={(...args) => {
-        console.log("[Combobox] onValueChange raw:", args);
-        handleValueChange(...args);
-      }}
+      onValueChange={handleValueChange}
       itemToStringLabel={(id) => getContactName(id)}
     >
       <ComboboxChips
@@ -91,7 +87,7 @@ export function ContactsCombobox({
         <ComboboxEmpty>Nenhum contato encontrado.</ComboboxEmpty>
         <ComboboxList>
           {(item) => (
-            <ComboboxItem key={item} value={item} onClick={() => console.log("[ComboboxItem] clicked:", item)}>
+            <ComboboxItem key={item} value={item}>
               {getContactName(item)}
             </ComboboxItem>
           )}

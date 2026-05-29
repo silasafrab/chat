@@ -22,7 +22,7 @@ export const ConnectionsCard = ({
   onEdit,
   onRemove,
 }: ConnectionsCardProps) => {
-  const { icon: Icon, label, color } =
+  const { icon: Icon, color } =
     connectionTypeMap[type] ?? connectionTypeMap.whatsapp;
 
   return (
