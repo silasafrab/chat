@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { format, startOfDay } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 
@@ -30,30 +29,7 @@ import { useContacts } from "@/hooks/use-contacts";
 import type { Message } from "@/types/message";
 import { Badge } from "@/components/ui/badge";
 import { ContactsCombobox } from "./contacts-combobox";
-
-const formSchema = z.object({
-  title: z.string().min(1, "O título é obrigatório"),
-  content: z.string().min(1, "O conteúdo é obrigatório"),
-  connectionId: z.string().min(1, "Selecione uma conexão"),
-  contactIds: z.array(z.string()).min(1, "Selecione pelo menos um contato"),
-  sendNow: z.boolean(),
-  scheduledDate: z.date().nullable(),
-  scheduledTime: z.string(),
-}).refine((data) => {
-  if (data.sendNow) return true;
-  if (!data.scheduledDate || !data.scheduledTime) return true;
-
-  const [hours, minutes] = data.scheduledTime.split(":").map(Number);
-  const scheduled = new Date(data.scheduledDate);
-  scheduled.setHours(hours, minutes, 0, 0);
-
-  return scheduled > new Date();
-}, {
-  message: "O agendamento deve ser no futuro.",
-  path: ["scheduledTime"],
-});
-
-type FormData = z.infer<typeof formSchema>;
+import { messageFormSchema, type MessageFormData as FormData } from "./message-schema";
 
 type MessageFormProps = {
   initialData?: Message;
@@ -87,7 +63,7 @@ export const MessageForm = ({
         ? format(initialData.scheduledAt, "HH:mm")
         : "08:00",
     },
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(messageFormSchema),
   });
 
   const sendNow = form.watch("sendNow");

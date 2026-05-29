@@ -25,5 +25,5 @@ export type UpdateMessageData = {
   content: string;
   connectionId: string;
   contactIds: string[];
-  scheduledAt: Date | null;
+  scheduledAt?: Date | null;
 };
