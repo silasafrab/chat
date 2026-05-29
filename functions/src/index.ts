@@ -1,14 +1,14 @@
-import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { getFirestore } from "firebase-admin/firestore";
+import { onSchedule } from "firebase-functions/v2/scheduler";
 
 admin.initializeApp();
 
-const db = admin.firestore();
+const db = getFirestore("nam5");
 
-// Scheduled function that runs every minute to check pending messages
-export const processScheduledMessages = functions.pubsub
-  .schedule("every 1 minutes")
-  .onRun(async () => {
+export const processScheduledMessages = onSchedule(
+  "every 1 minutes",
+  async () => {
     const now = admin.firestore.Timestamp.now();
 
     const snapshot = await db
@@ -18,16 +18,30 @@ export const processScheduledMessages = functions.pubsub
       .get();
 
     if (snapshot.empty) {
-      functions.logger.log("No scheduled messages to process");
+      console.log("No scheduled messages to process");
       return;
     }
 
     const batch = db.batch();
-    snapshot.docs.forEach((doc) => {
-      batch.update(doc.ref, { status: "sent" });
-    });
+
+    for (const doc of snapshot.docs) {
+      const data = doc.data();
+      const connectionId = data.connectionId;
+      let newStatus = "sent";
+
+      if (connectionId) {
+        const connectionDoc = await db.collection("connections").doc(connectionId).get();
+        const connection = connectionDoc.data();
+        if (!connection || !connection.active) {
+          newStatus = "blocked";
+        }
+      }
+
+      batch.update(doc.ref, { status: newStatus });
+    }
 
     await batch.commit();
 
-    functions.logger.log(`Processed ${snapshot.size} scheduled messages`);
-  });
+    console.log(`Processed ${snapshot.size} scheduled messages`);
+  },
+);

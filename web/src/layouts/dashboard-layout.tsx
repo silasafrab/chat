@@ -1,14 +1,16 @@
 import { Outlet } from "react-router";
 
-import { AppSidebar } from "@/components/composites/app-sidebar";
+import { AppSidebar, SIDEBAR_WIDTH_CLASS } from "@/components/composites/app-sidebar";
 
 export default function DashboardLayout() {
   return (
-    <div className="flex min-h-screen">
+    <div className="min-h-screen bg-background">
       <AppSidebar />
-      <main className="ml-64 flex-1 p-6">
-        <Outlet />
-      </main>
+      <div className={SIDEBAR_WIDTH_CLASS}>
+        <main className="min-h-screen p-6">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }

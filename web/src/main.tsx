@@ -1,7 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import { createBrowserRouter, RouterProvider } from "react-router";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router";
+import { Toaster } from "sonner";
 
 import { AuthProvider } from "@/contexts/auth-context";
 import { PrivateRoute } from "@/routes/private-route";
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
         element: <DashboardLayout />,
         children: [
           {
+            index: true,
+            element: <Navigate to="messages" replace />,
+          },
+          {
             path: "connections",
             element: <ConnectionsPage />,
           },
@@ -51,6 +56,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <AuthProvider>
       <RouterProvider router={router} />
+      <Toaster richColors closeButton position="top-right" />
     </AuthProvider>
   </StrictMode>,
 );
