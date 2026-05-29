@@ -220,7 +220,7 @@ export default function ContactsPage() {
           </div>
 
           <Card className="hidden px-5 md:block">
-            <Typography type="heading-s" className="font-bold">
+            <Typography type="heading-s" className="font-bold mb-3">
               Lista de contatos
             </Typography>
             <FilterBar

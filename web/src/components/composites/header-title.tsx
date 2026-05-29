@@ -12,7 +12,7 @@ interface HeaderTitleProps {
 export const HeaderTitle = ({ title, subtitle, button, buttonFn }: HeaderTitleProps) => {
   return (
     <Card className=" ">
-      <CardContent className="flex justify-between">
+      <CardContent className="flex flex-col gap-3 md:flex-row justify-between">
 
         <div className="max-w-120">
 

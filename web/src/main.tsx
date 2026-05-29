@@ -5,6 +5,7 @@ import { createBrowserRouter, Navigate, RouterProvider } from "react-router";
 import { Toaster } from "sonner";
 
 import { AuthProvider } from "@/contexts/auth-context";
+import { ThemeProvider } from "@/contexts/theme-context";
 import { PrivateRoute } from "@/routes/private-route";
 
 import LoginPage from "./pages/login/loginPage";
@@ -54,9 +55,11 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <AuthProvider>
-      <RouterProvider router={router} />
-      <Toaster richColors closeButton position="top-right" />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <RouterProvider router={router} />
+        <Toaster richColors closeButton position="top-right" />
+      </AuthProvider>
+    </ThemeProvider>
   </StrictMode>,
 );

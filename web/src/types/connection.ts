@@ -23,3 +23,10 @@ export type UpdateConnectionData = {
   type: ConnectionType;
   active: boolean;
 };
+
+export const connectionTypeIcons: Record<ConnectionType, string> = {
+  whatsapp: "whatsapp",
+  telegram: "telegram",
+  sms: "sms",
+  email: "email",
+};

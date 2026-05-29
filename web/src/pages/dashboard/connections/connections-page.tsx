@@ -167,7 +167,7 @@ export default function ConnectionsPage() {
         />
 
       ) : (
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-3">
           {paginatedItems.map((connection) => (
             <ConnectionsCard
               key={connection.id}

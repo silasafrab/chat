@@ -22,7 +22,7 @@ export const CreateMessageDialog = ({
 }: CreateMessageDialogProps) => {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="sm:max-w-lg">
+      <SheetContent side="right" className="flex flex-col sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>Nova mensagem</SheetTitle>
         </SheetHeader>
@@ -53,7 +53,7 @@ export const EditMessageDialog = ({
 }: EditMessageDialogProps) => {
   return (
     <Sheet open={open} onOpenChange={onOpenChange} >
-      <SheetContent side="right" className="sm:max-w-lg ">
+      <SheetContent side="right" className="flex flex-col sm:max-w-lg ">
         <SheetHeader>
           <SheetTitle>Editar mensagem</SheetTitle>
         </SheetHeader>

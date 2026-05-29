@@ -2,7 +2,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography/typography";
-import { connectionTypeMap } from "@/lib/connection-types";
+import { connectionTypeMap, getConnectionTypeIcon } from "@/lib/connection-types";
+import Icon from "@/components/ui/Icon/Icon";
 import type { ConnectionType } from "@/types/connection";
 
 interface ConnectionsCardProps {
@@ -22,7 +23,7 @@ export const ConnectionsCard = ({
   onEdit,
   onRemove,
 }: ConnectionsCardProps) => {
-  const { icon: Icon, color } =
+  const { color } =
     connectionTypeMap[type] ?? connectionTypeMap.whatsapp;
 
   return (
@@ -31,7 +32,7 @@ export const ConnectionsCard = ({
         <span
           className={`flex size-11 items-center justify-center rounded-full bg-primary ${color}`}
         >
-          <Icon className="size-5 text-primary-foreground" />
+          <Icon icon={getConnectionTypeIcon(type)} className="size-5 text-primary-foreground" />
         </span>
         <Badge variant={active ? "default" : "outline"}>
           {active ? "Ativo" : "Inativo"}

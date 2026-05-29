@@ -23,6 +23,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useConnections } from "@/hooks/use-connections";
 import { useContacts } from "@/hooks/use-contacts";
@@ -115,163 +116,167 @@ export const MessageForm = ({
   };
 
   return (
-    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 p-5">
-      <Controller
-        control={form.control}
-        name="title"
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel>Título</FieldLabel>
-            <Input
-              aria-invalid={fieldState.invalid}
-              placeholder="Título da mensagem"
-              {...field}
-            />
-            <FieldError errors={[fieldState.error]} />
-          </Field>
-        )}
-      />
-
-      <Controller
-        control={form.control}
-        name="content"
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel>Conteúdo da mensagem</FieldLabel>
-            <Textarea
-              aria-invalid={fieldState.invalid}
-              placeholder="Digite sua mensagem..."
-              className="min-h-[100px]"
-              {...field}
-            />
-            <FieldError errors={[fieldState.error]} />
-          </Field>
-        )}
-      />
-
-      <Controller
-        control={form.control}
-        name="connectionId"
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel>Conexão</FieldLabel>
-            <Select value={field.value} onValueChange={field.onChange}>
-              <SelectTrigger
-                aria-invalid={fieldState.invalid}
-                className="w-full"
-              >
-                <SelectValue placeholder="Selecione a conexão" />
-              </SelectTrigger>
-              <SelectContent>
-                {connections.map((connection) => (
-                  <SelectItem
-                    key={connection.id}
-                    value={connection.id}
-                    disabled={!connection.active}
-                  >
-                    {connection.name}
-                    {!connection.active && (
-                      <Badge variant="outline">Inativo</Badge>
-                    )}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FieldError errors={[fieldState.error]} />
-          </Field>
-        )}
-      />
-
-      {selectedConnectionId && (
-        <Controller
-          control={form.control}
-          name="contactIds"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Contatos</FieldLabel>
-              <ContactsCombobox
-                contacts={filteredContacts}
-                value={field.value ?? []}
-                onChange={field.onChange}
-                invalid={fieldState.invalid}
-              />
-              <FieldError errors={[fieldState.error]} />
-            </Field>
-          )}
-        />
-      )}
-
-      <div className="flex items-center justify-between rounded-3xl border p-4">
-        <div>
-          <p className="text-sm font-medium">Enviar agora</p>
-          <p className="text-xs text-muted-foreground">
-            {sendNow
-              ? "A mensagem será enviada imediatamente"
-              : "A mensagem será agendada"}
-          </p>
-        </div>
-        <Controller
-          control={form.control}
-          name="sendNow"
-          render={({ field }) => (
-            <Switch
-              checked={field.value}
-              onCheckedChange={field.onChange}
-            />
-          )}
-        />
-      </div>
-
-      {!sendNow && (
-        <div className="grid grid-cols-2 gap-3">
+    <form onSubmit={form.handleSubmit(handleSubmit)} className="flex min-h-0 flex-1 flex-col">
+      <ScrollArea className="min-h-0 flex-1 px-5">
+        <div className="space-y-4 pt-5 pb-3">
           <Controller
             control={form.control}
-            name="scheduledDate"
-            render={({ field }) => (
-              <Field>
-                <FieldLabel>Data</FieldLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !field.value && "text-muted-foreground",
-                      )}
-                    >
-                      <CalendarIcon className="size-4" />
-                      {field.value
-                        ? format(field.value, "dd/MM/yyyy")
-                        : "Selecionar data"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value ?? undefined}
-                      onSelect={(date) => field.onChange(date ?? null)}
-                      disabled={(date) => date < startOfDay(new Date())}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </Field>
-            )}
-          />
-          <Controller
-            control={form.control}
-            name="scheduledTime"
+            name="title"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Horário</FieldLabel>
-                <Input type="time" {...field} />
+                <FieldLabel>Título</FieldLabel>
+                <Input
+                  aria-invalid={fieldState.invalid}
+                  placeholder="Título da mensagem"
+                  {...field}
+                />
                 <FieldError errors={[fieldState.error]} />
               </Field>
             )}
           />
-        </div>
-      )}
 
-      <div className="flex justify-end gap-2">
+          <Controller
+            control={form.control}
+            name="content"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Conteúdo da mensagem</FieldLabel>
+                <Textarea
+                  aria-invalid={fieldState.invalid}
+                  placeholder="Digite sua mensagem..."
+                  className="min-h-[100px]"
+                  {...field}
+                />
+                <FieldError errors={[fieldState.error]} />
+              </Field>
+            )}
+          />
+
+          <Controller
+            control={form.control}
+            name="connectionId"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Conexão</FieldLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger
+                    aria-invalid={fieldState.invalid}
+                    className="w-full"
+                  >
+                    <SelectValue placeholder="Selecione a conexão" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {connections.map((connection) => (
+                      <SelectItem
+                        key={connection.id}
+                        value={connection.id}
+                        disabled={!connection.active}
+                      >
+                        {connection.name}
+                        {!connection.active && (
+                          <Badge variant="outline">Inativo</Badge>
+                        )}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FieldError errors={[fieldState.error]} />
+              </Field>
+            )}
+          />
+
+          {selectedConnectionId && (
+            <Controller
+              control={form.control}
+              name="contactIds"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Contatos</FieldLabel>
+                  <ContactsCombobox
+                    contacts={filteredContacts}
+                    value={field.value ?? []}
+                    onChange={field.onChange}
+                    invalid={fieldState.invalid}
+                  />
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
+            />
+          )}
+
+          <div className="flex items-center justify-between rounded-3xl border p-4">
+            <div>
+              <p className="text-sm font-medium">Agendar envio</p>
+              <p className="text-xs text-muted-foreground">
+                {sendNow
+                  ? "A mensagem será enviada imediatamente"
+                  : "Escolha a data e horário para o envio"}
+              </p>
+            </div>
+            <Controller
+              control={form.control}
+              name="sendNow"
+              render={({ field }) => (
+                <Switch
+                  checked={!field.value}
+                  onCheckedChange={(v) => field.onChange(!v)}
+                />
+              )}
+            />
+          </div>
+
+          {!sendNow && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Controller
+                control={form.control}
+                name="scheduledDate"
+                render={({ field }) => (
+                  <Field>
+                    <FieldLabel>Data</FieldLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !field.value && "text-muted-foreground",
+                          )}
+                        >
+                          <CalendarIcon className="size-4" />
+                          {field.value
+                            ? format(field.value, "dd/MM/yyyy")
+                            : "Selecionar data"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value ?? undefined}
+                          onSelect={(date) => field.onChange(date ?? null)}
+                          disabled={(date) => date < startOfDay(new Date())}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </Field>
+                )}
+              />
+              <Controller
+                control={form.control}
+                name="scheduledTime"
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel>Horário</FieldLabel>
+                    <Input type="time" {...field} />
+                    <FieldError errors={[fieldState.error]} />
+                  </Field>
+                )}
+              />
+            </div>
+          )}
+        </div>
+      </ScrollArea>
+
+      <div className="flex justify-end gap-2 border-t p-5">
         <Button type="button" variant="outline" onClick={onClose}>
           Cancelar
         </Button>
@@ -280,7 +285,9 @@ export const MessageForm = ({
             ? "Salvando..."
             : initialData
               ? "Atualizar"
-              : "Criar"}
+              : sendNow
+                ? "Enviar"
+                : "Agendar"}
         </Button>
       </div>
     </form>

@@ -14,7 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { connectionTypeMap, connectionTypes } from "@/lib/connection-types";
+import { connectionTypeMap, connectionTypes, getConnectionTypeIcon } from "@/lib/connection-types";
+import Icon from "@/components/ui/Icon/Icon";
 import type { Connection } from "@/types/connection";
 
 const formSchema = z.object({
@@ -106,11 +107,11 @@ export const ConnectionForm = ({
               </SelectTrigger>
               <SelectContent>
                 {connectionTypes.map((type) => {
-                  const { icon: Icon, color } = connectionTypeMap[type.value];
+                  const { color } = connectionTypeMap[type.value];
                   return (
                     <SelectItem key={type.value} value={type.value}>
                       <span className="flex items-center gap-2">
-                        <Icon className={`size-4 ${color}`} />
+                        <Icon icon={getConnectionTypeIcon(type.value)} className={`size-4 ${color}`} />
                         {type.label}
                       </span>
                     </SelectItem>

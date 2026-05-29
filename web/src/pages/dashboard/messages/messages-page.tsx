@@ -20,7 +20,6 @@ import { ConfirmDelete } from "@/components/composites/confirm-delete";
 import Icon from "@/components/ui/Icon/Icon";
 import { Typography } from "@/components/ui/typography/typography";
 import { useMessages } from "@/hooks/use-messages";
-import { useContacts } from "@/hooks/use-contacts";
 import { useConnections } from "@/hooks/use-connections";
 import { usePagination } from "@/hooks/use-pagination";
 import {
@@ -30,7 +29,10 @@ import {
 import { MessagesMobileCard } from "./components/messages-mobile-card";
 import type { Message } from "@/types/message";
 import type { CreateMessageData, UpdateMessageData } from "@/types/message";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, Info } from "lucide-react";
+import { getConnectionTypeIcon, connectionTypes } from "@/lib/connection-types";
+import { useContacts } from "@/hooks/use-contacts";
+import { MessageDetailsSheet } from "./components/dialogs/message-details-sheet";
 
 const statusOptions = [
   { value: "all", label: "Todas" },
@@ -39,18 +41,32 @@ const statusOptions = [
   { value: "blocked", label: "Bloqueadas" },
 ];
 
+const typeOptions = [
+  { value: "all", label: "Todos" },
+  ...connectionTypes.map((t) => ({ value: t.value, label: t.label })),
+];
+
 export default function MessagesPage() {
   const { messages, loading, create, update, remove } = useMessages();
-  const { contacts } = useContacts();
   const { connections } = useConnections();
+  const { contacts } = useContacts();
+
+  const connectionOptions = [
+    { value: "all", label: "Todas" },
+    ...connections.map((c) => ({ value: c.id, label: c.name })),
+  ];
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
+  const [detailMessage, setDetailMessage] = useState<Message | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Message | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
+  const [connectionFilter, setConnectionFilter] = useState("");
 
   const buildPayload = (data: {
     title: string;
@@ -69,8 +85,8 @@ export default function MessagesPage() {
       ? null
       : data.scheduledDate && data.scheduledTime
         ? new Date(
-            `${format(data.scheduledDate, "yyyy-MM-dd")}T${data.scheduledTime}:00`,
-          )
+          `${format(data.scheduledDate, "yyyy-MM-dd")}T${data.scheduledTime}:00`,
+        )
         : null,
   });
 
@@ -116,11 +132,15 @@ export default function MessagesPage() {
   const getConnectionName = (connectionId: string) =>
     connections.find((c) => c.id === connectionId)?.name ?? "—";
 
-  const getContactNames = (contactIds: string[]) =>
-    contactIds
-      .map((id) => contacts.find((c) => c.id === id)?.name)
-      .filter(Boolean)
-      .join(", ");
+  const getConnectionType = (connectionId: string) =>
+    connections.find((c) => c.id === connectionId)?.type;
+
+  const getContactCount = (contactIds: string[]) => {
+    const count = contactIds.length;
+    if (count === 0) return "Nenhum contato";
+    if (count === 1) return "1 contato";
+    return `${count} contatos`;
+  };
 
   const isConnectionActive = (connectionId: string) =>
     connections.find((c) => c.id === connectionId)?.active ?? false;
@@ -143,7 +163,14 @@ export default function MessagesPage() {
     const matchesStatus =
       !statusFilter || statusFilter === "all" || displayStatus === statusFilter;
 
-    return matchesSearch && matchesStatus;
+    const connectionType = getConnectionType(m.connectionId);
+    const matchesType =
+      !typeFilter || typeFilter === "all" || connectionType === typeFilter;
+
+    const matchesConnection =
+      !connectionFilter || connectionFilter === "all" || m.connectionId === connectionFilter;
+
+    return matchesSearch && matchesStatus && matchesType && matchesConnection;
   });
 
   const { page, totalPages, paginatedItems, goToPage } = usePagination(filteredMessages);
@@ -199,6 +226,8 @@ export default function MessagesPage() {
               search={{ value: search, onChange: setSearch, placeholder: "Buscar mensagem..." }}
               selects={[
                 { label: "Status", value: statusFilter, onValueChange: setStatusFilter, options: statusOptions },
+                { label: "Tipo", value: typeFilter, onValueChange: setTypeFilter, options: typeOptions },
+                { label: "Conexão", value: connectionFilter, onValueChange: setConnectionFilter, options: connectionOptions },
               ]}
             />
             {paginatedItems.length === 0 ? (
@@ -211,14 +240,21 @@ export default function MessagesPage() {
                 buttonFn={() => {
                   setSearch("");
                   setStatusFilter("");
+                  setTypeFilter("");
+                  setConnectionFilter("");
                 }}
               />
             ) : (
               <MessagesMobileCard
                 messages={paginatedItems}
                 getConnectionName={getConnectionName}
-                getContactNames={getContactNames}
+                getConnectionType={getConnectionType}
+                getContactCount={getContactCount}
                 getMessageDisplayStatus={getMessageDisplayStatus}
+                onDetails={(message) => {
+                  setDetailMessage(message);
+                  setDetailsOpen(true);
+                }}
                 onEdit={(message) => {
                   setEditingMessage(message);
                   setEditOpen(true);
@@ -244,7 +280,7 @@ export default function MessagesPage() {
           </div>
 
           <Card className="hidden px-5 md:block">
-            <Typography type="heading-s" className="font-bold">
+            <Typography type="heading-s" className="font-bold mb-3">
               Lista de mensagens
             </Typography>
             <FilterBar
@@ -252,6 +288,8 @@ export default function MessagesPage() {
               search={{ value: search, onChange: setSearch, placeholder: "Buscar mensagem..." }}
               selects={[
                 { label: "Status", value: statusFilter, onValueChange: setStatusFilter, options: statusOptions },
+                { label: "Tipo", value: typeFilter, onValueChange: setTypeFilter, options: typeOptions },
+                { label: "Conexão", value: connectionFilter, onValueChange: setConnectionFilter, options: connectionOptions },
               ]}
             />
 
@@ -265,6 +303,8 @@ export default function MessagesPage() {
                 buttonFn={() => {
                   setSearch("");
                   setStatusFilter("");
+                  setTypeFilter("");
+                  setConnectionFilter("");
                 }}
               />
             ) : (
@@ -277,7 +317,6 @@ export default function MessagesPage() {
                       <TableHead>Conexão</TableHead>
                       <TableHead>Contatos</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead>Agendamento</TableHead>
                       <TableHead className="w-[120px] text-right">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -285,57 +324,62 @@ export default function MessagesPage() {
                     {paginatedItems.map((message) => {
                       const displayStatus = getMessageDisplayStatus(message);
                       return (
-                      <TableRow key={message.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-2 font-medium">
-                            <span className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                              <Icon icon="paper-fill" size={18} />
-                            </span>
-                            {message.title}
-                          </div>
-                        </TableCell>
-                        <TableCell className="max-w-[200px] truncate">
-                          {message.content}
-                        </TableCell>
-                        <TableCell>{getConnectionName(message.connectionId)}</TableCell>
-                        <TableCell className="max-w-[180px] truncate">
-                          {getContactNames(message.contactIds)}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={displayStatus === "sent" ? "default" : displayStatus === "blocked" ? "destructive" : "outline"}
-                          >
-                            {displayStatus === "sent" ? "Enviada" : displayStatus === "blocked" ? "Bloqueada" : "Agendada"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {message.scheduledAt
-                            ? format(message.scheduledAt, "dd/MM/yyyy HH:mm")
-                            : "—"}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-1">
-                            {displayStatus === "scheduled" && (
-                            <Button
-                              size="icon"
-                              onClick={() => {
-                                setEditingMessage(message);
-                                setEditOpen(true);
-                              }}
+                        <TableRow key={message.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-2 font-medium">
+                              <span className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                                <Icon icon={getConnectionTypeIcon(getConnectionType(message.connectionId) ?? "whatsapp")} size={18} />
+                              </span>
+                              {message.title}
+                            </div>
+                          </TableCell>
+                          <TableCell className="max-w-[200px] truncate">
+                            {message.content}
+                          </TableCell>
+                          <TableCell>{getConnectionName(message.connectionId)}</TableCell>
+                          <TableCell>
+                            {getContactCount(message.contactIds)}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={displayStatus === "sent" ? "default" : displayStatus === "blocked" ? "destructive" : "outline"}
                             >
-                              <Icon icon="edit" />
-                            </Button>
-                          )}
-                            <Button
-                              variant="destructive"
-                              size="icon"
-                              onClick={() => setDeleteTarget(message)}
-                            >
-                              <Icon icon="trash" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
+                              {displayStatus === "sent" ? "Enviada" : displayStatus === "blocked" ? "Bloqueada" : "Agendada"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-1">
+                              <Button
+                                size="icon"
+                                variant="outline"
+                                onClick={() => {
+                                  setDetailMessage(message);
+                                  setDetailsOpen(true);
+                                }}
+                              >
+                                <Info className="size-4" />
+                              </Button>
+                              {displayStatus === "scheduled" && (
+                                <Button
+                                  size="icon"
+                                  onClick={() => {
+                                    setEditingMessage(message);
+                                    setEditOpen(true);
+                                  }}
+                                >
+                                  <Icon icon="edit" />
+                                </Button>
+                              )}
+                              <Button
+                                variant="destructive"
+                                size="icon"
+                                onClick={() => setDeleteTarget(message)}
+                              >
+                                <Icon icon="trash" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
                       );
                     })}
                   </TableBody>
@@ -361,6 +405,18 @@ export default function MessagesPage() {
           </Card>
         </>
       )}
+
+      <MessageDetailsSheet
+        open={detailsOpen}
+        onOpenChange={(open) => {
+          setDetailsOpen(open);
+          if (!open) setDetailMessage(null);
+        }}
+        message={detailMessage}
+        connectionName={getConnectionName(detailMessage?.connectionId ?? "")}
+        connectionType={getConnectionType(detailMessage?.connectionId ?? "")}
+        contacts={contacts}
+      />
 
       <ConfirmDelete
         open={deleteTarget !== null}

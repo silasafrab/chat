@@ -37,3 +37,16 @@ export const connectionTypes = Object.entries(connectionTypeMap).map(
     label: config.label,
   }),
 );
+
+export function getConnectionTypeIcon(type: ConnectionType): string {
+  switch (type) {
+    case "whatsapp":
+      return "whatsapp";
+    case "email":
+      return "email-fill";
+    case "sms":
+      return "mobile-chat";
+    case "telegram":
+      return "telegram";
+  }
+}

@@ -38,7 +38,7 @@ type FilterBarProps = {
 export const FilterBar = ({ search, selects, variante, className }: FilterBarProps) => {
   return (
     <Card className={cn(variante === "compact" ? "p-0" : "p-5", "shadow-none border-none", className)} >
-      <CardContent className={cn("px-0  flex justify-between")}  >
+      <CardContent className={cn("px-0  flex flex-col md:flex-row gap-2 justify-between")}  >
         {search && (
           <div className="relative flex">
             <Input

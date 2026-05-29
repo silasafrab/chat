@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { Logo } from "@/components/composites/logo";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Popover,
@@ -18,7 +17,7 @@ import {
 import { useAuth } from "@/contexts/auth-context";
 import { ThemeToggle } from "@/components/composites/theme-toggle";
 
-export const SIDEBAR_WIDTH_CLASS = "pl-0 md:pl-28 pb-18";
+
 
 const navItems: { to: string; icon: LucideIcon; label: string }[] = [
   { to: "/dashboard/connections", icon: Link2, label: "Conexões" },
@@ -26,7 +25,7 @@ const navItems: { to: string; icon: LucideIcon; label: string }[] = [
   { to: "/dashboard/messages", icon: MessageSquare, label: "Mensagens" },
 ];
 
-export const AppSidebar = () => {
+export const AppBottomBar = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
@@ -40,17 +39,11 @@ export const AppSidebar = () => {
   const initials = displayName.charAt(0).toUpperCase();
 
   return (
-    <aside className="fixed hidden md:block inset-y-0 left-0 z-40 w-28 border-r border-sidebar-border bg-background p-3">
-      <div className="flex h-full flex-col items-center justify-between rounded-2xl bg-primary py-5">
-        <NavLink
-          to="/dashboard/connections"
-          title="Início"
-          className="flex items-center justify-center rounded-xl p-1 transition-opacity hover:opacity-90"
-        >
-          <Logo className="size-10" aria-hidden />
-        </NavLink>
+    <aside className="fixed md:hidden  bottom-0  left-0 h-20 w-full z-40   border-sidebar-border bg-background p-0">
+      <div className="flex h-full px-4 flex-row items-center justify-between rounded-none bg-primary py-5">
 
-        <nav className="flex flex-col gap-2">
+
+        <nav className="flex flex-row    w-full justify-between gap-3">
           {navItems.map(({ to, icon: Icon, label }) => (
             <NavLink
               key={to}
@@ -68,9 +61,6 @@ export const AppSidebar = () => {
               <span className="sr-only">{label}</span>
             </NavLink>
           ))}
-        </nav>
-
-        <footer className="flex flex-col items-center gap-3">
           <Popover>
             <PopoverTrigger asChild>
               <button type="button" className="cursor-pointer">
@@ -81,7 +71,7 @@ export const AppSidebar = () => {
                 </Avatar>
               </button>
             </PopoverTrigger>
-            <PopoverContent side="right" align="center" className="w-48 p-2">
+            <PopoverContent side="top" align="center" className="w-48 p-2">
               <ThemeToggle />
               <button
                 type="button"
@@ -93,7 +83,9 @@ export const AppSidebar = () => {
               </button>
             </PopoverContent>
           </Popover>
-        </footer>
+        </nav>
+
+
       </div>
     </aside>
   );
