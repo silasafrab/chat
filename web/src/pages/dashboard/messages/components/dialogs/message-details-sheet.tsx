@@ -11,13 +11,6 @@ import { Badge } from "@/components/ui/badge";
 import { Typography } from "@/components/ui/typography/typography";
 import Icon from "@/components/ui/Icon/Icon";
 import { getConnectionTypeIcon } from "@/lib/connection-types";
-import {
-
-  Clock,
-  Send,
-
-  MessageSquare,
-} from "lucide-react";
 import type { Message } from "@/types/message";
 import type { Contact } from "@/types/contact";
 
@@ -71,27 +64,6 @@ export function MessageDetailsSheet({
       .map((id) => contacts.find((c) => c.id === id)?.name)
       .filter(Boolean)
       .join(", ");
-
-  const statusLabel =
-    message.status === "sent"
-      ? "Enviada"
-      : message.status === "blocked"
-        ? "Bloqueada"
-        : "Agendada";
-
-  const statusVariant =
-    message.status === "sent"
-      ? "default"
-      : message.status === "blocked"
-        ? "destructive"
-        : "outline";
-
-  const StatusIcon =
-    message.status === "sent"
-      ? Send
-      : message.status === "blocked"
-        ? MessageSquare
-        : Clock;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange} >
