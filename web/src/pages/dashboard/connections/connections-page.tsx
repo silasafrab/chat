@@ -2,6 +2,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { useConnections } from "@/hooks/use-connections";
+import { usePagination } from "@/hooks/use-pagination";
+import { Button } from "@/components/ui/button";
 import { HeaderTitle } from "@/components/composites/header-title";
 import { FilterBar } from "@/components/composites/filter-bar";
 import { ConnectionsCard } from "./components/ConnectionsCard";
@@ -12,6 +14,7 @@ import {
 import type { Connection } from "@/types/connection";
 import { EmptyCard } from "@/components/composites/emptyCard";
 import { ConfirmDelete } from "@/components/composites/confirm-delete";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 const typeOptions = [
   { value: "all", label: "Todos" },
@@ -101,6 +104,8 @@ export default function ConnectionsPage() {
     setStatusFilter("");
   };
 
+  const { page, totalPages, paginatedItems, goToPage } = usePagination(filteredConnections);
+
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -163,7 +168,7 @@ export default function ConnectionsPage() {
 
       ) : (
         <div className="grid grid-cols-4 gap-3">
-          {filteredConnections.map((connection) => (
+          {paginatedItems.map((connection) => (
             <ConnectionsCard
               key={connection.id}
               name={connection.name}
@@ -177,6 +182,22 @@ export default function ConnectionsPage() {
               onRemove={() => setDeleteTarget(connection)}
             />
           ))}
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-1 pt-2">
+          <Button variant="outline" size="icon" disabled={page <= 1} onClick={() => goToPage(page - 1)}>
+            <ChevronLeftIcon className="size-4" />
+          </Button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+            <Button key={p} variant={page === p ? "default" : "outline"} size="icon" onClick={() => goToPage(p)}>
+              {p}
+            </Button>
+          ))}
+          <Button variant="outline" size="icon" disabled={page >= totalPages} onClick={() => goToPage(page + 1)}>
+            <ChevronRightIcon className="size-4" />
+          </Button>
         </div>
       )}
 

@@ -22,6 +22,7 @@ import { Typography } from "@/components/ui/typography/typography";
 import { useMessages } from "@/hooks/use-messages";
 import { useContacts } from "@/hooks/use-contacts";
 import { useConnections } from "@/hooks/use-connections";
+import { usePagination } from "@/hooks/use-pagination";
 import {
   CreateMessageDialog,
   EditMessageDialog,
@@ -29,6 +30,7 @@ import {
 import { MessagesMobileCard } from "./components/messages-mobile-card";
 import type { Message } from "@/types/message";
 import type { CreateMessageData, UpdateMessageData } from "@/types/message";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 const statusOptions = [
   { value: "all", label: "Todas" },
@@ -144,6 +146,8 @@ export default function MessagesPage() {
     return matchesSearch && matchesStatus;
   });
 
+  const { page, totalPages, paginatedItems, goToPage } = usePagination(filteredMessages);
+
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -197,7 +201,7 @@ export default function MessagesPage() {
                 { label: "Status", value: statusFilter, onValueChange: setStatusFilter, options: statusOptions },
               ]}
             />
-            {filteredMessages.length === 0 ? (
+            {paginatedItems.length === 0 ? (
               <EmptyCard
                 embedded
                 variant="search"
@@ -211,7 +215,7 @@ export default function MessagesPage() {
               />
             ) : (
               <MessagesMobileCard
-                messages={filteredMessages}
+                messages={paginatedItems}
                 getConnectionName={getConnectionName}
                 getContactNames={getContactNames}
                 getMessageDisplayStatus={getMessageDisplayStatus}
@@ -221,6 +225,21 @@ export default function MessagesPage() {
                 }}
                 onDelete={setDeleteTarget}
               />
+            )}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-1 pt-2">
+                <Button variant="outline" size="icon" disabled={page <= 1} onClick={() => goToPage(page - 1)}>
+                  <ChevronLeftIcon className="size-4" />
+                </Button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                  <Button key={p} variant={page === p ? "default" : "outline"} size="icon" onClick={() => goToPage(p)}>
+                    {p}
+                  </Button>
+                ))}
+                <Button variant="outline" size="icon" disabled={page >= totalPages} onClick={() => goToPage(page + 1)}>
+                  <ChevronRightIcon className="size-4" />
+                </Button>
+              </div>
             )}
           </div>
 
@@ -236,7 +255,7 @@ export default function MessagesPage() {
               ]}
             />
 
-            {filteredMessages.length === 0 ? (
+            {paginatedItems.length === 0 ? (
               <EmptyCard
                 embedded
                 variant="search"
@@ -263,7 +282,7 @@ export default function MessagesPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredMessages.map((message) => {
+                    {paginatedItems.map((message) => {
                       const displayStatus = getMessageDisplayStatus(message);
                       return (
                       <TableRow key={message.id}>
@@ -322,6 +341,22 @@ export default function MessagesPage() {
                   </TableBody>
                 </Table>
               </CardContent>
+            )}
+
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-1 pt-2 pb-4">
+                <Button variant="outline" size="icon" disabled={page <= 1} onClick={() => goToPage(page - 1)}>
+                  <ChevronLeftIcon className="size-4" />
+                </Button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                  <Button key={p} variant={page === p ? "default" : "outline"} size="icon" onClick={() => goToPage(p)}>
+                    {p}
+                  </Button>
+                ))}
+                <Button variant="outline" size="icon" disabled={page >= totalPages} onClick={() => goToPage(page + 1)}>
+                  <ChevronRightIcon className="size-4" />
+                </Button>
+              </div>
             )}
           </Card>
         </>
