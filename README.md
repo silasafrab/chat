@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="Chat" src="./web/src/assets/hero.png" width="120" height="120" style="border-radius: 24px;">
+  <img width="1891" height="941" alt="image" src="https://github.com/user-attachments/assets/cd3b3e24-c0b4-4b49-88ed-3fd7e4636e75" />
 </p>
 
 <h1 align="center">Chat — Plataforma de Comunicação</h1>
