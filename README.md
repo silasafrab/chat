@@ -1,14 +1,13 @@
+<h1 align="center">Chat — Plataforma de Comunicação</h1>
 <p align="center">
   <img width="1891" height="941" alt="image" src="https://github.com/user-attachments/assets/cd3b3e24-c0b4-4b49-88ed-3fd7e4636e75" />
 </p>
-
-<h1 align="center">Chat — Plataforma de Comunicação</h1>
-
 <p align="center">
   <strong>Aplicação web para gerenciamento e envio de mensagens em massa</strong>
   <br />
   Agende, organize e dispare mensagens para seus contatos através de múltiplas conexões.
 </p>
+
 
 <p align="center">
   <a href="https://chat-756b4.web.app/">🌐 Acessar aplicação</a>
