@@ -151,7 +151,7 @@ web/
 ├── src/
 │   ├── components/
 │   │   ├── composites/       # Componentes reutilizáveis (sidebar, filtros, etc.)
-│   │   └── ui/               # Componentes base (shadcn/ui + Radix)
+│   │   └── ui/               # Componentes base (Radix)
 │   ├── contexts/
 │   │   ├── auth-context.tsx  # Contexto de autenticação
 │   │   └── theme-context.tsx # Contexto de tema (claro/escuro)
